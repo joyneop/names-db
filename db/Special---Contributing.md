@@ -8,7 +8,7 @@ Unless someone explicitly specifies its gender, we address it with neuter pronou
 
 ## Editing
 
-Now, the database is hosted on GitHub Pages, thus all changes are supposed to be submitted to the database through a pull request on GitHub. The repository page of NameDB is <a href="http://github.com/namesdb/namesdb.github.io">http://github.com/namesdb/namesdb.github.io</a>.
+Now, the database is hosted on GitHub Pages, thus all changes are supposed to be submitted to the database through a pull request on GitHub. The repository page of NamesDB is <a href="http://github.com/namesdb/namesdb.github.io">http://github.com/namesdb/namesdb.github.io</a>.
 
 GitHub has <a href="https://help.github.com/categories/collaborating-with-issues-and-pull-requests/">articles</a> to help users to better understand the workflow on GitHub.
 
@@ -20,7 +20,7 @@ Most discussions are supposed to happen in the <a href="https://github.com/names
 
 We certainly need moderators to organize discussions and review pull requests.
 
-For now, if you have at least 4 valid edits on NameDB, you may become a moderator. We usually don't need more than 10 moderators.
+For now, if you have at least 4 valid edits on NamesDB, you may become a moderator. We usually don't need more than 10 moderators.
 
 If you would like to become a moderator, create an issue.
 
