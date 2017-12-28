@@ -1,1 +1,1 @@
-# names-db
+# namesdb

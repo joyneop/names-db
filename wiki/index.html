@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>NamesDB</title>
+        <link rel="stylesheet" href="/css/normalize.css">
+        <link rel="stylesheet" href="/css/main.css">
+    </head>
+    <body>
+        <div class="overall">
+            <div class="header">
+                <div class="header-inner">
+                    <div class="">
+                        <h1><a href=".">NamesDB</a></h1>
+                    </div>
+                    <div class="nav">
+                        <nav>
+                            <div class="U-float-left">
+                                <a id="nav-homepage" href="/wiki/">Homepage</a>
+                                <a target="_blank" id="nav-edit">Edit</a>
+                                <a target="_blank" id="nav-history">History</a>
+                            </div>
+                            <div class="U-float-right">
+                                <form class="" action="./" method="get">
+                                    <input class="U-float-right" type="submit" value="GO">
+                                    <input class="U-float-right" type="text" name="article" value="" placeholder="Search a name">
+                                </form>
+                            </div>
+                            <div class="clear">
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="content-inner">
+                    <div class="content-header">
+                        <h2 class="content-header-title" id="js-ArticleTitle"></h2>
+                        <aside class="content-header-footnote">NamesDB, collection of names in fictions and reality.</aside>
+                    </div>
+                    <div class="content-article" id="js-Article">
+                    </div>
+                    <div class="content-footer">
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="footer-inner">
+                    <footer>
+                    © 2017 Various Authors. MIT License.
+                    </footer>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+        var convertMarkedTextIntoHtml = function (original) {
+            var tmp = original.trim();
+
+            // Turn into array
+            tmp = tmp.split('\n\n').map(function (sect) {
+                if (sect.indexOf('- ') === 0) {
+                    // Is <ul>
+                    return '<ul>' + sect.split('\n').map(function (li) {
+                        return '<li>' + li.slice(2) + '</li>';
+                    }).join('') + '</ul>';
+                } else if (sect.indexOf('***') === 0) {
+                    // Is <hr>
+                    return '<hr />';
+                } else if (sect.indexOf('# ') === 0) {
+                    // Is <h3>
+                    return '<h3>' + sect.slice(2) + '</h3>';
+                } else if (sect.indexOf('## ') === 0) {
+                    // Is <h4>
+                    return '<h4>' + sect.slice(3) + '</h4>';
+                } else if (sect.indexOf('### ') === 0) {
+                    // Is <h5>
+                    return '<h5>' + sect.slice(4) + '</h5>';
+                } else {
+                    // Is <p>
+                    return '<p>' + sect + '</p>';
+                };
+            }).join('');
+
+            // Convert Wikipedia links
+            tmp = tmp.replace(/\[\[WP\:(\w+):(.+?)\]\]/ig, function () {
+                return '<a target="_blank" href="https://__WIKIPEDIALANG__.wikiepdia.org/wiki/__WIKIPEDIATITLEPROCESSED__">__WIKIPEDIATITLE__</a>'.replace(/__WIKIPEDIALANG__/g, arguments[1].toLowerCase()).replace(/__WIKIPEDIATITLE__/g, arguments[2]).replace(/__WIKIPEDIATITLEPROCESSED__/g, arguments[2].replace(/\s/g, '_'));
+            });
+
+            // Convert internal links
+
+            tmp = tmp.replace(/\[\[(.+?)\]\]/ig, function () {
+                return '<a href="?article=__INTERNALLINKTITLEPROCESSED__">__INTERNALLINKTITLE__</a>'.replace(/__INTERNALLINKTITLE__/g, arguments[1]).replace(/__INTERNALLINKTITLEPROCESSED__/g, arguments[1].replace(/:/g, '---').replace(/\s/g, '_'));
+            });
+
+            return tmp;
+        };
+        var articleContentLoadEventHandler = function (e) {
+            console.log(e);
+            var articleContentText = ''
+            if (e.target.status === 200) {
+                // 200 OK
+                articleContentText = e.target.responseText;
+            } else if (e.target.status === 404){
+                // 404 Not Found
+                articleContentText = '404 Not Found. Return to <a href="/">Homepage</a>, or <a target="_blank" href="__CREATE_LINK__">create an entry</a> for this name?'.replace('__CREATE_LINK__', 'https://github.com/namesdb/namesdb.github.io/new/master/db/__TITLE__.md'.replace('__TITLE__', articleTitleEscaped));
+            } else {
+                // 999 Unkonwn Issue
+                articleContentText = 'An unkonwn issue occured.';
+            };
+            document.getElementById('js-Article').innerHTML = convertMarkedTextIntoHtml(articleContentText);
+        };
+        var articleTitleEscaped = '';
+        if (window.location.href.indexOf('?article=') === -1) {
+            articleTitleEscaped = 'Special---Homepage';
+            document.title = 'NamesDB';
+            document.getElementById('js-ArticleTitle').innerHTML = 'Welcome to NamesDB';
+        } else {
+            articleTitleEscaped = window.location.href.slice(window.location.href.indexOf('?article=') + 9, undefined);
+            document.title = articleTitleEscaped + ' — NamesDB';
+            document.getElementById('js-ArticleTitle').innerHTML = articleTitleEscaped.replace(/---/g, ':').replace(/_/g, ' ');
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/db/' + articleTitleEscaped + '.md', undefined);
+        xhr.addEventListener('load', articleContentLoadEventHandler);
+        xhr.send();
+        document.getElementById('nav-edit').href = 'https://github.com/namesdb/namesdb.github.io/edit/master/db/__TITLE__.md'.replace('__TITLE__', articleTitleEscaped);
+        document.getElementById('nav-history').href = 'https://github.com/namesdb/namesdb.github.io/commits/master/db/__TITLE__.md'.replace('__TITLE__', articleTitleEscaped);
+        </script>
+    </body>
+</html>
