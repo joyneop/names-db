@@ -140,8 +140,8 @@
         xhr.open('GET', '/db/' + articleTitleEscaped.replace(':', '---') + '.md', undefined);
         xhr.addEventListener('load', articleContentLoadEventHandler);
         xhr.send();
-        document.getElementById('nav-edit').href = 'https://github.com/namesdb/namesdb.github.io/edit/master/db/__TITLE__.md'.replace('__TITLE__', articleTitleEscaped);
-        document.getElementById('nav-history').href = 'https://github.com/namesdb/namesdb.github.io/commits/master/db/__TITLE__.md'.replace('__TITLE__', articleTitleEscaped);
+        document.getElementById('nav-edit').href = 'https://github.com/namesdb/namesdb.github.io/edit/master/db/__TITLE__.md'.replace('__TITLE__', articleTitleEscaped.replace(':', '---'));
+        document.getElementById('nav-history').href = 'https://github.com/namesdb/namesdb.github.io/commits/master/db/__TITLE__.md'.replace('__TITLE__', articleTitleEscaped.replace(':', '---'));
         </script>
     </body>
 </html>
