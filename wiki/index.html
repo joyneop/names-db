@@ -20,12 +20,21 @@
                                 <a id="nav-homepage" href="/wiki/">Homepage</a>
                                 <a target="_blank" id="nav-edit">Edit</a>
                                 <a target="_blank" id="nav-history">History</a>
+                                <a id="nav-contributing" href="/wiki/?article=Special:Contributing">Contributing</a>
                             </div>
                             <div class="U-float-right">
-                                <form class="" action="./" method="get">
+                                <form class="" action="./" method="get" id="search-form">
                                     <input class="U-float-right" type="submit" value="GO">
-                                    <input class="U-float-right" type="text" name="article" value="" placeholder="Search a name">
+                                    <input class="U-float-right" type="text" name="article" value="" placeholder="Search a name" id="search-input">
                                 </form>
+                                <script type="text/javascript">
+                                document.getElementById('search-form').onsubmit = function (e) {
+                                    console.log(e);
+                                    var input = document.getElementById('search-input');
+                                    input.value = input.value[0].toUpperCase() + input.value.slice(1);
+                                    return true;
+                                };
+                                </script>
                             </div>
                             <div class="clear">
                             </div>
@@ -84,19 +93,18 @@
 
             // Convert Wikipedia links
             tmp = tmp.replace(/\[\[WP\:(\w+):(.+?)\]\]/ig, function () {
-                return '<a target="_blank" href="https://__WIKIPEDIALANG__.wikiepdia.org/wiki/__WIKIPEDIATITLEPROCESSED__">__WIKIPEDIATITLE__</a>'.replace(/__WIKIPEDIALANG__/g, arguments[1].toLowerCase()).replace(/__WIKIPEDIATITLE__/g, arguments[2]).replace(/__WIKIPEDIATITLEPROCESSED__/g, arguments[2].replace(/\s/g, '_'));
+                return '<a target="_blank" href="https://__WIKIPEDIALANG__.wikipedia.org/wiki/__WIKIPEDIATITLEPROCESSED__">__WIKIPEDIATITLE__</a>'.replace(/__WIKIPEDIALANG__/g, arguments[1].toLowerCase()).replace(/__WIKIPEDIATITLE__/g, arguments[2]).replace(/__WIKIPEDIATITLEPROCESSED__/g, arguments[2].replace(/\s/g, '_'));
             });
 
             // Convert internal links
 
             tmp = tmp.replace(/\[\[(.+?)\]\]/ig, function () {
-                return '<a href="?article=__INTERNALLINKTITLEPROCESSED__">__INTERNALLINKTITLE__</a>'.replace(/__INTERNALLINKTITLE__/g, arguments[1]).replace(/__INTERNALLINKTITLEPROCESSED__/g, arguments[1].replace(/:/g, '---').replace(/\s/g, '_'));
+                return '<a href="?article=__INTERNALLINKTITLEPROCESSED__">__INTERNALLINKTITLE__</a>'.replace(/__INTERNALLINKTITLE__/g, arguments[1]).replace(/__INTERNALLINKTITLEPROCESSED__/g, arguments[1].replace(/\s/g, '_'));
             });
 
             return tmp;
         };
         var articleContentLoadEventHandler = function (e) {
-            console.log(e);
             var articleContentText = ''
             if (e.target.status === 200) {
                 // 200 OK
@@ -112,16 +120,24 @@
         };
         var articleTitleEscaped = '';
         if (window.location.href.indexOf('?article=') === -1) {
-            articleTitleEscaped = 'Special---Homepage';
-            document.title = 'NamesDB';
-            document.getElementById('js-ArticleTitle').innerHTML = 'Welcome to NamesDB';
+            if (window.location.href.indexOf('?') === -1) {
+                articleTitleEscaped = 'Special:Homepage';
+                document.title = 'NamesDB';
+                document.getElementById('js-ArticleTitle').innerHTML = 'Welcome to NamesDB';
+            } else {
+                window.location.replace('/wiki/');
+            };
         } else {
-            articleTitleEscaped = window.location.href.slice(window.location.href.indexOf('?article=') + 9, undefined);
-            document.title = articleTitleEscaped + ' — NamesDB';
-            document.getElementById('js-ArticleTitle').innerHTML = articleTitleEscaped.replace(/---/g, ':').replace(/_/g, ' ');
+            // Normal article
+            articleTitleEscaped = window.location.href.slice(window.location.href.indexOf('?article=') + 9, ( window.location.href.indexOf('&') === -1 ? undefined : window.location.href.indexOf('&')));
+            if (articleTitleEscaped === '') {
+                window.location.replace('/wiki/');
+            }
+            document.title = decodeURI(articleTitleEscaped.replace(/---/g, ':').replace(/_/g, ' ')) + ' — NamesDB';
+            document.getElementById('js-ArticleTitle').innerHTML = decodeURI(articleTitleEscaped.replace(/---/g, ':').replace(/_/g, ' '));
         }
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/db/' + articleTitleEscaped + '.md', undefined);
+        xhr.open('GET', '/db/' + articleTitleEscaped.replace(':', '---') + '.md', undefined);
         xhr.addEventListener('load', articleContentLoadEventHandler);
         xhr.send();
         document.getElementById('nav-edit').href = 'https://github.com/namesdb/namesdb.github.io/edit/master/db/__TITLE__.md'.replace('__TITLE__', articleTitleEscaped);

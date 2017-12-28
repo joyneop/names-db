@@ -104,17 +104,16 @@ html {
     background: #BBB;
 }
 
-.header-inner, .content-inner, .footer-inner {
+.header .header-inner {
     max-width: 800px;
+    padding: 20px 0;
     margin: 0 auto;
 }
 
-.header .header-inner {
-    padding: 20px 0;
-}
-
 .content .content-inner {
+    max-width: 800px;
     padding: 50px 0;
+    margin: 0 auto;
 }
 
 .content .content-header .content-header-title {
@@ -131,8 +130,17 @@ html {
     color: #999;
 }
 
+.content .content-article {
+    padding-top: 30px;
+}
+
 .content h3 {
     font-size: 26px;
+    font-weight: 600;
+}
+
+.content h4 {
+    font-size: 20px;
     font-weight: 600;
 }
 
@@ -143,5 +151,7 @@ html {
 }
 
 .footer .footer-inner {
+    max-width: 800px;
     padding: 50px 0;
+    margin: 0 auto;
 }

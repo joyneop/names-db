@@ -6,4 +6,5 @@ Welcome to NamesDB.
 
 # Recently Added Names
 
+- [[Προμηθεύς]]
 - [[Prometheus]]
