@@ -6,5 +6,6 @@ Welcome to NamesDB.
 
 # Recently Added Names
 
+- [[Emiya Kiritsugu]]
 - [[Προμηθεύς]]
 - [[Prometheus]]
