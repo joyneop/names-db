@@ -24,7 +24,7 @@
                             </div>
                             <div class="U-float-right">
                                 <form class="" action="./" method="get" id="search-form">
-                                    <input class="U-float-right" type="submit" value="GO">
+                                    <input class="U-float-right" type="submit" value="GO" id="search-submit">
                                     <input class="U-float-right" type="text" name="article" value="" placeholder="Search a name" id="search-input">
                                 </form>
                                 <script type="text/javascript">
@@ -85,6 +85,12 @@
                 } else if (sect.indexOf('### ') === 0) {
                     // Is <h5>
                     return '<h5>' + sect.slice(4) + '</h5>';
+                } else if (sect.indexOf('> ') === 0) {
+                    // Is blockquote
+                    return '<blockquote>' + sect.slice(2) + '</blockquote>';
+                } else if (sect.indexOf('//') === 0) {
+                    // Is comment
+                    return '';
                 } else {
                     // Is <p>
                     return '<p>' + sect + '</p>';
@@ -99,7 +105,7 @@
             // Convert internal links
 
             tmp = tmp.replace(/\[\[(.+?)\]\]/ig, function () {
-                return '<a href="?article=__INTERNALLINKTITLEPROCESSED__">__INTERNALLINKTITLE__</a>'.replace(/__INTERNALLINKTITLE__/g, arguments[1]).replace(/__INTERNALLINKTITLEPROCESSED__/g, arguments[1].replace(/\s/g, '_'));
+                return '<a href="?article=__INTERNALLINKTITLEPROCESSED__">__INTERNALLINKTITLE__</a>'.replace(/__INTERNALLINKTITLE__/g, arguments[1]).replace(/__INTERNALLINKTITLEPROCESSED__/g, arguments[1].replace(/\s/g, '_')).replace(/>Category:(.+)<\/a>/, '>$1</a>');
             });
 
             return tmp;
@@ -108,12 +114,26 @@
             var articleContentText = ''
             if (e.target.status === 200) {
                 // 200 OK
-                articleContentText = e.target.responseText;
+                if (articleTitleEscaped.match(/^(Special|Category):/) === null) {
+                    // Normal article
+                    articleContentText = 'The name "{{NAME}}" may refer to:\n\n'.replace('{{NAME}}', decodeURI(articleTitleEscaped.replace(/_/g, ' '))) + e.target.responseText;
+                } else {
+                    // Special article
+                    articleContentText = e.target.responseText;
+                }
             } else if (e.target.status === 404){
                 // 404 Not Found
-                articleContentText = '404 Not Found. Return to <a href="/">Homepage</a>, or <a target="_blank" href="__CREATE_LINK__">create an entry</a> for this name?'.replace('__CREATE_LINK__', 'https://github.com/namesdb/namesdb.github.io/new/master/db/__TITLE__.md'.replace('__TITLE__', articleTitleEscaped));
+                document.getElementById('js-ArticleTitle').innerHTML = '404 Not Found';
+                if (articleTitleEscaped.match(/^(Special|Category):/) === null) {
+                    // Normal article
+                    articleContentText = 'There is no article named "{{NAME}}" yet. Return to <a href="/">Homepage</a>, or <a target="_blank" href="__CREATE_LINK__">create an entry</a> for this name?'.replace('{{NAME}}', decodeURI(articleTitleEscaped.replace(/_/g, ' '))).replace('__CREATE_LINK__', 'https://github.com/namesdb/namesdb.github.io/new/master?path=db&filename=__TITLE__.md'.replace('__TITLE__', articleTitleEscaped));
+                } else {
+                    // Special article
+                    articleContentText = 'There is no article named "{{NAME}}" yet. Return to <a href="/">Homepage</a>?'.replace('{{NAME}}', decodeURI(articleTitleEscaped.replace(/_/g, ' ')));
+                }
             } else {
                 // 999 Unkonwn Issue
+                document.getElementById('js-ArticleTitle').innerHTML = 'Unknown Error';
                 articleContentText = 'An unkonwn issue occured.';
             };
             document.getElementById('js-Article').innerHTML = convertMarkedTextIntoHtml(articleContentText);
@@ -136,12 +156,22 @@
             document.title = decodeURI(articleTitleEscaped.replace(/---/g, ':').replace(/_/g, ' ')) + ' — NamesDB';
             document.getElementById('js-ArticleTitle').innerHTML = decodeURI(articleTitleEscaped.replace(/---/g, ':').replace(/_/g, ' '));
         }
+        if (articleTitleEscaped.indexOf('+') !== -1) {
+            window.location.replace('/wiki/?article=' + articleTitleEscaped.replace(/\+/g, '_'));
+        }
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/db/' + articleTitleEscaped.replace(':', '---') + '.md', undefined);
         xhr.addEventListener('load', articleContentLoadEventHandler);
         xhr.send();
         document.getElementById('nav-edit').href = 'https://github.com/namesdb/namesdb.github.io/edit/master/db/__TITLE__.md'.replace('__TITLE__', articleTitleEscaped.replace(':', '---'));
         document.getElementById('nav-history').href = 'https://github.com/namesdb/namesdb.github.io/commits/master/db/__TITLE__.md'.replace('__TITLE__', articleTitleEscaped.replace(':', '---'));
+        </script>
+        <script type="text/javascript">
+        // Adjust search field width for mobile devices
+        if (document.querySelector('nav').offsetHeight > document.querySelector('nav').children[1].offsetHeight * 1.5) {
+            document.getElementById('search-input').style.width = (window.screen.width - 20*2 - 15 - document.getElementById('search-submit').offsetWidth) + 'px';
+            document.querySelector('form').style.marginTop = '10px'
+        }
         </script>
     </body>
 </html>

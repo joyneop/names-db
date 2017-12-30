@@ -93,6 +93,7 @@ html {
     border: none;
     border-radius: 5px;
     display: block;
+    width: 80px;
     height: 32px;
     padding: 0 20px;
     margin: 0 0 0 15px;;
